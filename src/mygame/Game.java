@@ -3,23 +3,24 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Rectangle;
 
+
 import mygame.MyGame.Enemy;
 import jgame.*;
 import jgame.platform.*;
 /** Minimal shooter illustrating Eclipse usage. */
 public class Game extends StdGame {
 	Player dino;
-	public static void main(String[]args) {new Game(parseSizeArgs(args,0));}
+	public static void main(String[]args) {new Game(new JGPoint(640,480));}
 	public Game() { initEngineApplet(); }
 	public Game(JGPoint size) { initEngine(size.x,size.y); }
+
+
+		public void initCanvas() { setCanvasSettings(32,24,8,8,null,null,null); } 
+
 	
-	public void initCanvas() { 
-		setCanvasSettings(32,24,8,8,null,null,null); 
-	
-		}
 
 	public void initGame() {
-		
+
 		defineMedia("example3.tbl");
 		//setBGImage("mybackground");
 		if (isMidlet()) {
@@ -28,9 +29,10 @@ public class Game extends StdGame {
 		} else {
 			setFrameRate(45,1);
 		}
-		this.
 		setHighscores(10,new Highscore(0,"nobody"),15);
 		startgame_ingame=true;
+		setPFSize(64,30);
+		
 		try { Thread.sleep(4000); }
 		catch (InterruptedException e) {}
 	}
@@ -40,20 +42,34 @@ public class Game extends StdGame {
 		checkCollision(2,2);
 		checkCollision(2,1);
 		checkCollision(3,2);
-		if(checkTime(0,(int)(8000),(int)((120-level/2))))
-			new Zombie(dino);
-		if(countObjects("zombie",0)==0 && gametime>=8000){
-			levelDone();			
+		checkCollision(4,1);
+		int xofs=(int)dino.x;
+		int yofs=(int)dino.y;
+		setViewOffset(xofs,yofs,true);
+		//Even levels with normal zombies
+		if(level%2==0 || level==0){
+			if(checkTime(0,(int)(800),(int)((120-level/2))))
+				new Zombie(dino);
+			if(countObjects("zombie",0)==0 && gametime>80){
+				levelDone();
+			}
+		}
+		//Odd boss levels
+		else{
+			if(countObjects("boss",0)==0 && gametime>80)
+				levelDone();
+			if(countObjects("boss",0)==0){
+				for(int i=0;i<level;i++)
+					new Boss(dino);
+			}
 		}
 	}
-	
+
 	public void initNewLife() {
 		removeObjects(null,0);
 		dino = new Player(pfWidth()/2,pfHeight()-32,5);
-//		if (checkTime(0,(int)(800),(int)((12-level/2))))
-//			new Zombie(dino);
-		new Boss(dino);
 		
+		gametime=0;
 	}
 	public void defineLevel(){
 		removeObjects(null,0);
@@ -68,11 +84,6 @@ public class Game extends StdGame {
 
 	public class Player extends JGObject {
 		int weapon = 1;
-		boolean gun = true;
-		boolean machine_gun=false;
-		boolean cross_bow=false;
-		boolean rocket_launcher=false;
-		boolean sword = false;
 		int xfacing=0;
 		int yfacing=1;
 		public Player(double x,double y,double speed) {
@@ -102,24 +113,32 @@ public class Game extends StdGame {
 				setGraphic("dino");
 				yfacing=-5;xfacing=0;
 			}
-			
+
 			if (getKey(key_fire) && (weapon==1 || weapon==3) && countObjects("bullet",0) < 1 ) {
-				new JGObject("bullet",true,x,y,3,"dino", xfacing,yfacing, -2);
+				new JGObject("bullet",true,x,y,3,"bulletsh", xfacing,yfacing, -2);
 				clearKey(key_fire);
 			}
 			if (getKey(key_fire) && weapon==2 && countObjects("mbullet",0)<3){
-				new JGObject("mbullet",true,x,y,3,"dino", xfacing,yfacing, -2);
+				new JGObject("mbullet",true,x,y,3,"bulletsh", xfacing,yfacing, -2);
 				clearKey(key_fire);
 			}	
-			
+			if (getKey(key_fire) && weapon==4){
+				new JGObject("laser",true,x,y,3,"bulletsh", xfacing,yfacing, -2);
+
+			}
+
 			if(getKey(key_changeright)){
 				changeWeapon();
 				clearKey(key_changeright);
 			}
 		}
-		//player hits zombie
+		//player hits zombie or boss
 		public void hit(JGObject obj) {
 			if (obj.colid==2 && colid==1){ 
+				lifeLost();
+				remove();
+			}
+			if(obj.colid==4 && colid==1){
 				lifeLost();
 				remove();
 			}
@@ -135,16 +154,21 @@ public class Game extends StdGame {
 	}
 	public class Boss extends JGObject{
 		public Player p;
+		int hitpoints;
 		public Boss(Player dino){
 			super("boss",true,Game.this.random(0,pfWidth()),Game.this.random(0,pfHeight()),2,"myanim_l",0,0,1,1,-1);
-			xspeed=.1;yspeed=.1;
+			xspeed=.4;yspeed=.4;
 			p=dino;
+			hitpoints=0;
 		}
 		public void move(){
 			if(hitWalls()){ }
 			if (checkTime(0,(int)(80000000),(int)((12-level/2))))
-				new JGObject("bullet",true,x,y,4,"dino", random(-1,1),random(-1,1), -2);
-			
+				new JGObject("bullet",true,x,y,4,"dino", random(-3,3),random(-3,3), -2);
+			if(checkTime(0,(int)(1000000),500)){
+				for(int i=0;i<30;i++)
+					new JGObject("bullet",true,x,y,4,"dino", random(-3,3),random(-3,3), -2);
+			}
 		}
 		public boolean hitWalls(){
 			if ( (x >  pfWidth()-16 && xspeed>0)
@@ -159,6 +183,20 @@ public class Game extends StdGame {
 			}
 			return false;
 		}
+		public void hit(JGObject o) {
+			if(o.colid==3 && hitpoints<level*5+12){
+				hitpoints++;
+				if(p.weapon!=3)o.remove();
+			}
+			if(o.colid==3 && hitpoints==level*5+12){
+				if(p.weapon!=3)o.remove();
+				remove();
+				score += 5;
+
+			}
+
+		}
+		
 	}
 	public class Zombie extends JGObject{
 		public static final double SPEED = .1;
@@ -166,7 +204,7 @@ public class Game extends StdGame {
 		public int hitpoints;
 		public Zombie(Player dino){
 			super("zombie",true,Game.this.random(0,pfWidth()),Game.this.random(0,pfHeight()),2,"myanim_l",0,0,1,1,-1);
-			
+
 			xspeed = SPEED;
 			yspeed = SPEED;
 			p = dino;
@@ -180,7 +218,7 @@ public class Game extends StdGame {
 			if(hitWalls()){ }
 
 			else if(hitZombiex() || hitZombiey()){}
-			
+
 			else{
 				xspeed=SPEED;yspeed=SPEED;
 				if(this.p.x>x ){
@@ -222,7 +260,7 @@ public class Game extends StdGame {
 				if(checkCollision(2,4*SPEED,0)==0){xspeed=SPEED; return true;}
 				return true;
 			}
-			
+
 			return false;
 		}
 		public boolean hitZombiey(){
@@ -236,7 +274,7 @@ public class Game extends StdGame {
 				if(checkCollision(2,0,4*.4)==0){yspeed=SPEED; return true;}
 				return true;
 			}
-			
+
 			return false;
 		}
 		public void hit(JGObject o) {
@@ -248,11 +286,11 @@ public class Game extends StdGame {
 				if(p.weapon!=3)o.remove();
 				remove();
 				score += 5;
-				
+
 			}
-			
+
 		}
-		
+
 	}
 	public void paintFrameTitle(){
 		this.
