@@ -30,8 +30,7 @@ public class Game extends StdGame {
 		setHighscores(10,new Highscore(0,"nobody"),15);
 		startgame_ingame=true;
 		setPFSize(64,48);
-
-		try { Thread.sleep(4000); }
+		try { Thread.sleep(2000); }
 		catch (InterruptedException e) {}
 	}
 	public void doFrameInGame() {
@@ -52,13 +51,13 @@ public class Game extends StdGame {
 			levelDone();
 		}
 
-		//level2+
-		if(level>0){
+		//level3+
+		/*if(level>1){
 			if(countObjects("boss",0)==0 && gametime>80)
 				levelDone();
 			if(checkTime(0,(int)(800),(int)((100-level/2))))
 				new Boss();
-		}
+		}*/
 
 	}
 
@@ -82,6 +81,7 @@ public class Game extends StdGame {
 		int weapon = 1;
 		int xfacing=0;
 		int yfacing=1;
+		String weapon_dir="r";
 		public Player(double x,double y,double speed) {
 			super("player",true,x,y,1,"dude", 0,0,speed,speed,-1);
 		}
@@ -89,38 +89,43 @@ public class Game extends StdGame {
 			setDir(0,0);
 
 			if (getKey(key_left)  && x > xspeed){
-				xdir=-1;
+				xdir=-1; xfacing=-1; yfacing=0;
 				setGraphic("dude");
-				xfacing=-5; yfacing=0;
 			}
 			if (getKey(key_right) && x < pfWidth()-5-yspeed){
-				xdir=1;
+				xdir=1;xfacing=1;yfacing=0;
 				setGraphic("dude");
-				xfacing=5;yfacing=0;
+				
 
 			}
 			if (getKey(key_down) && y<pfHeight()-10){
-				ydir=1;
+				ydir=1;yfacing=1;xfacing=0;
 				setGraphic("dude");	
-				yfacing=5;xfacing=0;
+				
 			}
 			if (getKey(key_up) && y>0) 	{
-				ydir=-1;
+				ydir=-1;yfacing=-1;xfacing=0;
 				setGraphic("dude");
-				yfacing=-5;xfacing=0;
+				
 			}
-
-			if (getKey(key_fire) && (weapon==1 || weapon==3) && countObjects("bullet",0) < 1 ) {
-				new JGObject("bullet",true,x,y,3,"gun", xfacing,yfacing, -2);
+			//which direction weapon should be used
+			if(xfacing==1)weapon_dir="r";
+			if(xfacing==-1)weapon_dir="l";
+			if(yfacing==1)weapon_dir="u";
+			if(yfacing==-1)weapon_dir="d";
+			if (getKey(key_fire) && weapon==1 && countObjects("bullet",0) < 1 ) {
+				new JGObject("bullet",true,x,y,3,"gun"+weapon_dir, xfacing*6,yfacing*6, -2);
 				clearKey(key_fire);
-
 			}
 			if (getKey(key_fire) && weapon==2 && countObjects("mbullet",0)<3){
-				new JGObject("mbullet",true,x,y,3,"arrow", xfacing,yfacing, -2);
+				new JGObject("mbullet",true,x,y,3,"gun"+weapon_dir, xfacing*6,yfacing*6, -2);
 				clearKey(key_fire);
 			}	
+			if(getKey(key_fire) && weapon==3 && countObjects("arrow",0)<1){
+				new JGObject("arrow",true,x,y,3,"arrow"+weapon_dir, xfacing*6,yfacing*6, -2);
+			}
 			if (getKey(key_fire) && weapon==4){
-				new JGObject("laser",true,x,y,3,"laserr", xfacing,yfacing, -2);
+				new JGObject("laser",true,x,y,3,"laser"+weapon_dir, xfacing*6,yfacing*6, -2);
 			}
 
 			if(getKey(key_changeright)){
@@ -128,7 +133,7 @@ public class Game extends StdGame {
 				clearKey(key_changeright);
 			}
 		}
-		//player hits zombie or boss
+		//player hits zombie or projectile
 		public void hit(JGObject obj) {
 			if (obj.colid==2 && colid==1){ 
 				lifeLost();
@@ -156,7 +161,7 @@ public class Game extends StdGame {
 		public void move(){
 			if(hitWalls()){ }
 			if (checkTime(0,(int)(80000000),(int)20))
-				new JGObject("bullet",true,x,y,4,"dino", random(-3,3),random(-3,3), -2);
+				new JGObject("bullet",true,x,y,4,"blood", random(-3,3),random(-3,3), -2);
 		}
 	}
 	public class Zombie extends Enemy{
@@ -188,7 +193,7 @@ public class Game extends StdGame {
 				}
 			}
 			if (level>0 && checkTime(0,80000000,30))
-				new JGObject("bullet",true,x,y,4,"bullet", random(-3,3),random(-3,3), -2);
+				new JGObject("bullet",true,x,y,4,"blood", random(-3,3),random(-3,3), -2);
 		}
 
 		public boolean hitZombiex(){
@@ -226,8 +231,6 @@ public class Game extends StdGame {
 		this.
 		setFont(new JGFont("arial",0,10));
 		drawString("Prehistoric Zombie Fighting Game thing", viewWidth()/2,viewHeight()/4,0);
-		System.out.println(pfWidth());
-		System.out.println(pfHeight());
 		drawString("Press Space to Start",
 				viewWidth()/2,viewHeight()/2,0);
 	}
