@@ -3,26 +3,28 @@ package mygame;
 import jgame.*;
 import jgame.platform.*;
 /** Minimal shooter illustrating Eclipse usage. */
-//a comment
 public class MyGame extends StdGame {
 	public static void main(String[]args) {new MyGame(parseSizeArgs(args,0));}
 	public MyGame() { initEngineApplet(); }
 	public MyGame(JGPoint size) { initEngine(size.x,size.y); }
 	public void initCanvas() { setCanvasSettings(32,24,8,8,null,null,null); }
 	public void initGame() {
-		defineMedia("mygame.tbl");
+		defineMedia("example3.tbl");
 		if (isMidlet()) {
 			setFrameRate(20,1);
 			setGameSpeed(2.0);
 		} else {
 			setFrameRate(45,1);
 		}
+		
+		// Set Background
+		setBGImage("mybackground");
 		setHighscores(10,new Highscore(0,"nobody"),15);
 		startgame_ingame=true;
 	}
 	public void initNewLife() {
 		removeObjects(null,0);
-		new Player(pfWidth()/2,pfHeight()-32,5);
+		Player p = new Player(pfWidth()/2,pfHeight()-32,5);
 	}
 	public void startGameOver() { removeObjects(null,0); }
 	public void doFrameInGame() {
@@ -52,15 +54,18 @@ public class MyGame extends StdGame {
 			y +=.1;
 			if (y>pfHeight()) y = -8;
 		}
-		public void hit(JGObject o) {
-			remove();
-			o.remove();
-			score += 5;
-		}
+		
+//		public void hit(JGObject o) {
+//			remove();
+//			o.remove();
+//			score += 5;
+//			this.
+//		}
+		
 	}
 	public class Player extends JGObject {
 		public Player(double x,double y,double speed) {
-			super("player",true,x,y,1,"tankl", 0,0,speed,speed,-1);
+			super("player",true,x,y,1,"dino", 0,0,speed,speed,-1);
 		}
 		public void move() {
 			setDir(0,0);
@@ -79,4 +84,5 @@ public class MyGame extends StdGame {
 			}
 		}
 	}
+	
 }
