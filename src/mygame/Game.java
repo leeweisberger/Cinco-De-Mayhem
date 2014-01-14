@@ -173,11 +173,9 @@ public class Game extends StdGame {
 	public class BloodExploder extends Enemy{
 		public BloodExploder(){
 			super("boss",.4,getSpawn()[0],getSpawn()[1]);
+			this.setAnimation("myshooter_l", "myshooter_r", "myshooter_l4");
 		}
 		public void move(){
-			if (xspeed < 0) setGraphic("myshooter_l"); 
-			if (xspeed > 0) setGraphic("myshooter_r");  
-			if(xspeed==0)setGraphic("myshooter_l4");
 			if(hitWalls()){ }
 			if (checkTime(0,(int)(80000000),(int)120))
 				for(int i=0;i<10;i++)
@@ -190,7 +188,7 @@ public class Game extends StdGame {
 	public class Zombie extends Enemy{
 		public Zombie(){
 			super("zombie",.4,getSpawn()[0],getSpawn()[1]);
-			
+			this.setAnimation("myalien_l", "myalien_r", "myalienr4");
 			
 		}
 	}
@@ -230,8 +228,8 @@ public class Game extends StdGame {
 		public void hit(JGObject o) {
 			if(o.colid==3 && hitpoints<3){
 				hitpoints++;
-				if(angry)
-					this.SPEED=.8;
+				if(angry){angry();}
+					
 				if(dino.weapon!=3)o.remove();
 				
 			}
@@ -241,11 +239,18 @@ public class Game extends StdGame {
 				score += 5;
 			}
 		}
+		public void angry(){
+			this.SPEED=.8;
+			setAnimation("myangry_l", "myangry_r", "myangry_l4");
+			
+		}
+		public void setAnimation(String left, String right, String still){
+			if (xspeed < 0) setGraphic(left); 
+			if (xspeed > 0) setGraphic(right);  
+			if(xspeed==0)setGraphic(still);
+		}
 		public void move(){
-			if (xspeed < 0) setGraphic("myalien_l"); 
-			if (xspeed > 0) setGraphic("myalien_r");  
-			if(xspeed==0)setGraphic("myalien_l4");
-
+		
 			if(hitWalls()){ }
 
 			else if(hitZombiex() || hitZombiey()){}
@@ -297,9 +302,6 @@ public class Game extends StdGame {
 			}
 
 			return false;
-		}
-		public void angry(){
-			
 		}
 
 	}
