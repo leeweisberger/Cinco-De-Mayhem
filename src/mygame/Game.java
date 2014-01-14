@@ -13,11 +13,11 @@ import jgame.platform.*;
 /** Minimal shooter illustrating Eclipse usage. */
 public class Game extends StdGame {
 	Player dino;
-	public static void main(String[]args) {new Game(new JGPoint(640,480));}
+	public static void main(String[]args) {new Game(new JGPoint(1280,960));}
 	public Game() { initEngineApplet(); }
 	public Game(JGPoint size) { initEngine(size.x,size.y); }
 
-	public void initCanvas() { setCanvasSettings(32,24,8,8,null,null,null); } 
+	public void initCanvas() { setCanvasSettings(48,32,8,8,null,null,null); } 
 
 	public void initGame() {
 
@@ -34,6 +34,9 @@ public class Game extends StdGame {
 		setPFSize(64,48);
 		try { Thread.sleep(2000); }
 		catch (InterruptedException e) {}
+
+		try { Thread.sleep(2000); }
+		catch (InterruptedException e) {}
 	}
 	public void doFrameInGame() {
 		// Move all objects.
@@ -45,11 +48,12 @@ public class Game extends StdGame {
 		int xofs=(int)dino.x;
 		int yofs=(int)dino.y;
 		setViewOffset(xofs,yofs,true);
-
+		System.out.println(countObjects("zombie",0));
 		//level1
 		if(checkTime(0,(int)(800),(int)((40+level*4))))
 			new Zombie();
 		if(countObjects("zombie",0)==0 && gametime>80){
+
 			levelDone();
 		}
 
@@ -79,7 +83,7 @@ public class Game extends StdGame {
 		if(random(0,1)>.5)range[1]=y1;
 		else{range[1]=y2;}
 		return range;
-		
+
 	}
 	public void defineLevel(){
 		removeObjects(null,0);
@@ -99,7 +103,7 @@ public class Game extends StdGame {
 		int xfacing=0;
 		int yfacing=1;
 		String weapon_dir="r";
-		
+
 		public Player(double x,double y,double speed) {
 			super("player",true,x,y,1,"mymex_l4", 0,0,speed,speed,-1);
 		}
@@ -109,28 +113,20 @@ public class Game extends StdGame {
 			if(xdir==0 && ydir==0)setGraphic("mymex_l4");
 			if(ydir<0)setGraphic("mymex_d");
 			if(ydir>0)setGraphic("mymex_u");
-			
+
 			setDir(0,0);
 
 			if (getKey(key_left)  && x > xspeed){
 				xdir=-1; xfacing=-1; yfacing=0;
-				//setGraphic("myme");
 			}
 			if (getKey(key_right) && x < pfWidth()-5-yspeed){
 				xdir=1;xfacing=1;yfacing=0;
-				//setGraphic("dude");
-				
-
 			}
 			if (getKey(key_down) && y<pfHeight()-10){
 				ydir=1;yfacing=1;xfacing=0;
-				//setGraphic("dude");	
-				
 			}
 			if (getKey(key_up) && y>0) 	{
 				ydir=-1;yfacing=-1;xfacing=0;
-				//setGraphic("dude");
-				
 			}
 			//which direction weapon should be used
 			if(xfacing==1)weapon_dir="r";
@@ -169,16 +165,14 @@ public class Game extends StdGame {
 			}
 		}
 		public void changeWeapon(){
-			System.out.println(weapon);
 			if(weapon==4+1)weapon=1;
 			else
 				weapon++;
 		}
 	}
 	public class BloodExploder extends Enemy{
-		private static final double SPEED = .4;
 		public BloodExploder(){
-			super("boss","dino",SPEED,getSpawn()[0],getSpawn()[1]);
+			super("boss",.4,getSpawn()[0],getSpawn()[1]);
 		}
 		public void move(){
 			if (xspeed < 0) setGraphic("myshooter_l"); 
@@ -190,14 +184,64 @@ public class Game extends StdGame {
 					new JGObject("bullet",true,x,y,4,"blood", random(-3,3),random(-3,3), -2);
 		}
 	}
+
+
+
 	public class Zombie extends Enemy{
-		private static final double SPEED = .4;
 		public Zombie(){
-			super("zombie","dino",SPEED,getSpawn()[0],getSpawn()[1]);
+			super("zombie",.4,getSpawn()[0],getSpawn()[1]);
+			
+			
+		}
+	}
+	public class AngryZombie extends Enemy{
+		
+		public AngryZombie(){
+			super("angryzombie",.4,getSpawn()[0],getSpawn()[1]);
+			this.angry=true;
+			this.hitpoints=-4;
+		}
+			
+		
+	}
+	abstract class Enemy extends JGObject{
+		private double SPEED = .4;
+		public int hitpoints;
+		boolean angry;
+		public Enemy(String name,double speed,double xspawn,double yspawn){
+			super(name,true,xspawn,yspawn,2,"dino",0,0,1,1,-1);	
+			xspeed = speed;
+			yspeed = speed;
+			hitpoints=0;
+		}
+		public boolean hitWalls(){
+			if ( (x >  pfWidth()-16 && xspeed>0)
+					||   (x <            0  && xspeed<0) ) {
+				xspeed = -xspeed;
+				return true;
+			}
+			if ( (y > pfHeight()-16 && yspeed>0)
+					||   (y <            0  && yspeed<0) ) {
+				yspeed = -yspeed;
+				return true;
+			}
+			return false;
+		}
+		public void hit(JGObject o) {
+			if(o.colid==3 && hitpoints<3){
+				hitpoints++;
+				if(angry)
+					this.SPEED=.8;
+				if(dino.weapon!=3)o.remove();
+				
+			}
+			if(o.colid==3 && hitpoints==3){
+				if(dino.weapon!=3)o.remove();
+				remove();
+				score += 5;
+			}
 		}
 		public void move(){
-			double r = random(0,1);
-			System.out.println(xspeed);
 			if (xspeed < 0) setGraphic("myalien_l"); 
 			if (xspeed > 0) setGraphic("myalien_r");  
 			if(xspeed==0)setGraphic("myalien_l4");
@@ -220,12 +264,12 @@ public class Game extends StdGame {
 				if(dino.y<y  ){
 					yspeed = -Math.abs(yspeed); 
 				}
-				
+
 			}
 			if (level>0 && checkTime(0,80000000,70))
 				new JGObject("bullet",true,x,y,4,"blood", random(-3,3),random(-3,3), -2);
-		}
 
+		}
 		public boolean hitZombiex(){
 			if(checkCollision(2,4*SPEED,0)!=0){
 				if(xspeed!=0){xspeed=0;return true;}
@@ -254,47 +298,14 @@ public class Game extends StdGame {
 
 			return false;
 		}
-
-
-	}
-	abstract class Enemy extends JGObject{
-
-		public int hitpoints;
-		public Enemy(String name,String image,double speed,double xspawn,double yspawn){
-			super(name,true,xspawn,yspawn,2,image,0,0,1,1,-1);	
-			xspeed = speed;
-			yspeed = speed;
-
-			hitpoints=0;
+		public void angry(){
+			
 		}
-		public boolean hitWalls(){
-			if ( (x >  pfWidth()-16 && xspeed>0)
-					||   (x <            0  && xspeed<0) ) {
-				xspeed = -xspeed;
-				return true;
-			}
-			if ( (y > pfHeight()-16 && yspeed>0)
-					||   (y <            0  && yspeed<0) ) {
-				yspeed = -yspeed;
-				return true;
-			}
-			return false;
-		}
-		public void hit(JGObject o) {
-			if(o.colid==3 && hitpoints<3){
-				hitpoints++;
-				if(dino.weapon!=3)o.remove();
-			}
-			if(o.colid==3 && hitpoints==3){
-				if(dino.weapon!=3)o.remove();
-				remove();
-				score += 5;
-			}
-		}
-		
+
 	}
 	public void paintFrameStartLevel(){
-		drawString("Level" + stage+1,viewWidth()/2,viewHeight()/4,0);
+		drawString("Level " + stage+1,viewWidth()/2,viewHeight()/4,0);
+		drawString("START",viewWidth()/2,viewHeight()/4+50,0);
 		if(level==1){
 			drawString("New Weapon: machine gun",viewWidth()/2,viewHeight()/2,0);
 			drawString("New Enemy: blood spitter",viewWidth()/2,viewHeight()/1.5,0);
@@ -304,16 +315,16 @@ public class Game extends StdGame {
 			drawString("New Enemy: blood gusher",viewWidth()/2,viewHeight()/1.5,0);
 		}
 		if(level==3)drawString("New Weapon: laser",viewWidth()/2,viewHeight()/2,0);
-			
-		
+
+
 	}
 	public void paintFrameTitle(){
-		
-		setFont(new JGFont("arial",0,10));
-		drawString("Prehistoric Zombie Fighting Game thing", viewWidth()/2,viewHeight()/4,0);
+		setFont(new JGFont("arial",1,10));
+		drawString("Zombie Invasion: Will You Survive???", viewWidth()/2,viewHeight()/4,0);
 		drawString("Press Space to Start",
 				viewWidth()/2,viewHeight()/2,0);
 		drawString("Press Enter for Instructions",viewWidth()/2,viewHeight()/1.5,0);
+		drawString("Next", viewWidth()/2,viewHeight()/4,0);
 	}
 }
 
