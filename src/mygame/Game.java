@@ -170,7 +170,7 @@ public class Game extends StdGame {
 		}
 		public void changeWeapon(){
 			System.out.println(weapon);
-			if(weapon==level+1)weapon=1;
+			if(weapon==4+1)weapon=1;
 			else
 				weapon++;
 		}
@@ -181,6 +181,9 @@ public class Game extends StdGame {
 			super("boss","dino",SPEED,getSpawn()[0],getSpawn()[1]);
 		}
 		public void move(){
+			if (xspeed < 0) setGraphic("myshooter_l"); 
+			if (xspeed > 0) setGraphic("myshooter_r");  
+			if(xspeed==0)setGraphic("myshooter_l4");
 			if(hitWalls()){ }
 			if (checkTime(0,(int)(80000000),(int)120))
 				for(int i=0;i<10;i++)
@@ -204,7 +207,7 @@ public class Game extends StdGame {
 			else if(hitZombiex() || hitZombiey()){}
 
 			else{
-
+				xspeed=SPEED;yspeed=SPEED;
 				if(dino.x>x ){
 					xspeed = Math.abs(xspeed);
 				}
@@ -217,7 +220,7 @@ public class Game extends StdGame {
 				if(dino.y<y  ){
 					yspeed = -Math.abs(yspeed); 
 				}
-				if(dino.x==x)xspeed=0;
+				
 			}
 			if (level>0 && checkTime(0,80000000,70))
 				new JGObject("bullet",true,x,y,4,"blood", random(-3,3),random(-3,3), -2);
