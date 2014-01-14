@@ -5,6 +5,8 @@ import java.awt.Rectangle;
 
 
 
+import java.util.ArrayList;
+
 import mygame.MyGame.Enemy;
 import jgame.*;
 import jgame.platform.*;
@@ -45,19 +47,19 @@ public class Game extends StdGame {
 		setViewOffset(xofs,yofs,true);
 
 		//level1
-		if(checkTime(0,(int)(800),(int)((50-level/2))))
+		if(checkTime(0,(int)(800),(int)((40+level*4))))
 			new Zombie();
 		if(countObjects("zombie",0)==0 && gametime>80){
 			levelDone();
 		}
 
 		//level3+
-		/*if(level>1){
+		if(level>1){
 			if(countObjects("boss",0)==0 && gametime>80)
 				levelDone();
 			if(checkTime(0,(int)(800),(int)((100-level/2))))
 				new Boss();
-		}*/
+		}
 
 	}
 
@@ -66,14 +68,29 @@ public class Game extends StdGame {
 		dino = new Player(pfWidth()/2,pfHeight()-32,5);
 		gametime=0;
 	}
+	public double[] getSpawn(){
+		double[] range = new double[2];
+		double x1=dino.x-pfWidth()/2;
+		double x2=dino.x+pfWidth()/2;
+		double y1=dino.y-pfHeight()/2;
+		double y2=dino.y-pfHeight()/2;
+		if(random(0,1)>.5)range[0]=x1;
+		else{range[0]=x2;}
+		if(random(0,1)>.5)range[1]=y1;
+		else{range[1]=y2;}
+		return range;
+		
+	}
 	public void defineLevel(){
 		removeObjects(null,0);
 		initNewLife();
+		dino.weapon=1;
 	}
 	public void incrementLevel() {
 		score += 50;
 		if (level<7) level++;
 		stage++;
+		dino.weapon=1;
 	}
 	public void startGameOver() { removeObjects(null,0); }
 
@@ -128,9 +145,9 @@ public class Game extends StdGame {
 				new JGObject("laser",true,x,y,3,"laser"+weapon_dir, xfacing*6,yfacing*6, -2);
 			}
 
-			if(getKey(key_changeright)){
+			if(getKey(key_cycleweapon)){
 				changeWeapon();
-				clearKey(key_changeright);
+				clearKey(key_cycleweapon);
 			}
 		}
 		//player hits zombie or projectile
@@ -148,7 +165,8 @@ public class Game extends StdGame {
 			return this;
 		}
 		public void changeWeapon(){
-			if(weapon == 5)weapon = 1;
+			System.out.println(weapon);
+			if(weapon==level+1)weapon=1;
 			else
 				weapon++;
 		}
@@ -156,18 +174,19 @@ public class Game extends StdGame {
 	public class Boss extends Enemy{
 		private static final double SPEED = .4;
 		public Boss(){
-			super("boss","dino",SPEED);
+			super("boss","dino",SPEED,getSpawn()[0],getSpawn()[1]);
 		}
 		public void move(){
 			if(hitWalls()){ }
-			if (checkTime(0,(int)(80000000),(int)20))
-				new JGObject("bullet",true,x,y,4,"blood", random(-3,3),random(-3,3), -2);
+			if (checkTime(0,(int)(80000000),(int)120))
+				for(int i=0;i<10;i++)
+					new JGObject("bullet",true,x,y,4,"blood", random(-3,3),random(-3,3), -2);
 		}
 	}
 	public class Zombie extends Enemy{
 		private static final double SPEED = .4;
 		public Zombie(){
-			super("zombie","dino",SPEED);
+			super("zombie","dino",SPEED,getSpawn()[0],getSpawn()[1]);
 		}
 		public void move(){
 			double r = random(0,1);
@@ -192,7 +211,7 @@ public class Game extends StdGame {
 					yspeed = -Math.abs(yspeed); 
 				}
 			}
-			if (level>0 && checkTime(0,80000000,30))
+			if (level>0 && checkTime(0,80000000,70))
 				new JGObject("bullet",true,x,y,4,"blood", random(-3,3),random(-3,3), -2);
 		}
 
@@ -228,17 +247,32 @@ public class Game extends StdGame {
 
 	}
 	public void paintFrameTitle(){
-		this.
+		
 		setFont(new JGFont("arial",0,10));
 		drawString("Prehistoric Zombie Fighting Game thing", viewWidth()/2,viewHeight()/4,0);
 		drawString("Press Space to Start",
 				viewWidth()/2,viewHeight()/2,0);
+		drawString("Press Enter for Instructions",viewWidth()/2,viewHeight()/1.5,0);
+	}
+	public void paintFrameStartLevel(){
+		drawString("Level" + stage+1,viewWidth()/2,viewHeight()/4,0);
+		if(level==1){
+			drawString("New Weapon: machine gun",viewWidth()/2,viewHeight()/2,0);
+			drawString("New Enemy: blood spitter",viewWidth()/2,viewHeight()/1.5,0);
+		}
+		if(level==2){
+			drawString("New Weapon: arrow",viewWidth()/2,viewHeight()/2,0);
+			drawString("New Enemy: blood gusher",viewWidth()/2,viewHeight()/1.5,0);
+		}
+		if(level==3)drawString("New Weapon: laser",viewWidth()/2,viewHeight()/2,0);
+			
+		
 	}
 	abstract class Enemy extends JGObject{
 
 		public int hitpoints;
-		public Enemy(String name,String image,double speed){
-			super(name,true,Game.this.random(0,pfWidth()),Game.this.random(0,pfHeight()),2,image,0,0,1,1,-1);	
+		public Enemy(String name,String image,double speed,double xspawn,double yspawn){
+			super(name,true,xspawn,yspawn,2,image,0,0,1,1,-1);	
 			xspeed = speed;
 			yspeed = speed;
 
@@ -267,8 +301,8 @@ public class Game extends StdGame {
 				remove();
 				score += 5;
 			}
-
 		}
+		
 	}
 }
 
