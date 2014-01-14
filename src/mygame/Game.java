@@ -22,7 +22,7 @@ public class Game extends StdGame {
 	public void initGame() {
 
 		defineMedia("example3.tbl");
-		setBGImage("grass");
+		setBGImage("lot");
 		if (isMidlet()) {
 			setFrameRate(20,1);
 			setGameSpeed(2.0);
@@ -58,7 +58,7 @@ public class Game extends StdGame {
 			if(countObjects("boss",0)==0 && gametime>80)
 				levelDone();
 			if(checkTime(0,(int)(800),(int)((100-level/2))))
-				new Boss();
+				new BloodExploder();
 		}
 
 	}
@@ -99,30 +99,37 @@ public class Game extends StdGame {
 		int xfacing=0;
 		int yfacing=1;
 		String weapon_dir="r";
+		
 		public Player(double x,double y,double speed) {
-			super("player",true,x,y,1,"dude", 0,0,speed,speed,-1);
+			super("player",true,x,y,1,"mymex_l4", 0,0,speed,speed,-1);
 		}
 		public void move() {
+			if (xdir < 0) setGraphic("mymex_l"); 
+			if (xdir>0) setGraphic("mymex_r");
+			if(xdir==0 && ydir==0)setGraphic("mymex_l4");
+			if(ydir<0)setGraphic("mymex_d");
+			if(ydir>0)setGraphic("mymex_u");
+			
 			setDir(0,0);
 
 			if (getKey(key_left)  && x > xspeed){
 				xdir=-1; xfacing=-1; yfacing=0;
-				setGraphic("dude");
+				//setGraphic("myme");
 			}
 			if (getKey(key_right) && x < pfWidth()-5-yspeed){
 				xdir=1;xfacing=1;yfacing=0;
-				setGraphic("dude");
+				//setGraphic("dude");
 				
 
 			}
 			if (getKey(key_down) && y<pfHeight()-10){
 				ydir=1;yfacing=1;xfacing=0;
-				setGraphic("dude");	
+				//setGraphic("dude");	
 				
 			}
 			if (getKey(key_up) && y>0) 	{
 				ydir=-1;yfacing=-1;xfacing=0;
-				setGraphic("dude");
+				//setGraphic("dude");
 				
 			}
 			//which direction weapon should be used
@@ -161,9 +168,6 @@ public class Game extends StdGame {
 				remove();
 			}
 		}
-		public Player getPlayer(){
-			return this;
-		}
 		public void changeWeapon(){
 			System.out.println(weapon);
 			if(weapon==level+1)weapon=1;
@@ -171,9 +175,9 @@ public class Game extends StdGame {
 				weapon++;
 		}
 	}
-	public class Boss extends Enemy{
+	public class BloodExploder extends Enemy{
 		private static final double SPEED = .4;
-		public Boss(){
+		public BloodExploder(){
 			super("boss","dino",SPEED,getSpawn()[0],getSpawn()[1]);
 		}
 		public void move(){
@@ -190,14 +194,17 @@ public class Game extends StdGame {
 		}
 		public void move(){
 			double r = random(0,1);
-			if (xspeed < 0) setGraphic("myanim_l"); else setGraphic("myanim_r");
+			System.out.println(xspeed);
+			if (xspeed < 0) setGraphic("myalien_l"); 
+			if (xspeed > 0) setGraphic("myalien_r");  
+			if(xspeed==0)setGraphic("myalien_l4");
 
 			if(hitWalls()){ }
 
 			else if(hitZombiex() || hitZombiey()){}
 
 			else{
-				xspeed=SPEED;yspeed=SPEED;
+
 				if(dino.x>x ){
 					xspeed = Math.abs(xspeed);
 				}
@@ -210,6 +217,7 @@ public class Game extends StdGame {
 				if(dino.y<y  ){
 					yspeed = -Math.abs(yspeed); 
 				}
+				if(dino.x==x)xspeed=0;
 			}
 			if (level>0 && checkTime(0,80000000,70))
 				new JGObject("bullet",true,x,y,4,"blood", random(-3,3),random(-3,3), -2);
@@ -246,28 +254,6 @@ public class Game extends StdGame {
 
 
 	}
-	public void paintFrameTitle(){
-		
-		setFont(new JGFont("arial",0,10));
-		drawString("Prehistoric Zombie Fighting Game thing", viewWidth()/2,viewHeight()/4,0);
-		drawString("Press Space to Start",
-				viewWidth()/2,viewHeight()/2,0);
-		drawString("Press Enter for Instructions",viewWidth()/2,viewHeight()/1.5,0);
-	}
-	public void paintFrameStartLevel(){
-		drawString("Level" + stage+1,viewWidth()/2,viewHeight()/4,0);
-		if(level==1){
-			drawString("New Weapon: machine gun",viewWidth()/2,viewHeight()/2,0);
-			drawString("New Enemy: blood spitter",viewWidth()/2,viewHeight()/1.5,0);
-		}
-		if(level==2){
-			drawString("New Weapon: arrow",viewWidth()/2,viewHeight()/2,0);
-			drawString("New Enemy: blood gusher",viewWidth()/2,viewHeight()/1.5,0);
-		}
-		if(level==3)drawString("New Weapon: laser",viewWidth()/2,viewHeight()/2,0);
-			
-		
-	}
 	abstract class Enemy extends JGObject{
 
 		public int hitpoints;
@@ -303,6 +289,28 @@ public class Game extends StdGame {
 			}
 		}
 		
+	}
+	public void paintFrameStartLevel(){
+		drawString("Level" + stage+1,viewWidth()/2,viewHeight()/4,0);
+		if(level==1){
+			drawString("New Weapon: machine gun",viewWidth()/2,viewHeight()/2,0);
+			drawString("New Enemy: blood spitter",viewWidth()/2,viewHeight()/1.5,0);
+		}
+		if(level==2){
+			drawString("New Weapon: arrow",viewWidth()/2,viewHeight()/2,0);
+			drawString("New Enemy: blood gusher",viewWidth()/2,viewHeight()/1.5,0);
+		}
+		if(level==3)drawString("New Weapon: laser",viewWidth()/2,viewHeight()/2,0);
+			
+		
+	}
+	public void paintFrameTitle(){
+		
+		setFont(new JGFont("arial",0,10));
+		drawString("Prehistoric Zombie Fighting Game thing", viewWidth()/2,viewHeight()/4,0);
+		drawString("Press Space to Start",
+				viewWidth()/2,viewHeight()/2,0);
+		drawString("Press Enter for Instructions",viewWidth()/2,viewHeight()/1.5,0);
 	}
 }
 
