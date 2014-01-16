@@ -17,7 +17,7 @@ public class Game extends StdGame {
 	public Game() { initEngineApplet(); }
 	public Game(JGPoint size) { initEngine(size.x,size.y); }
 
-	public void initCanvas() { setCanvasSettings(48,32,8,8,null,null,null); } 
+	public void initCanvas() { setCanvasSettings(48,32,8,8,JGColor.red,null,null); } 
 
 	public void initGame() {
 		defineMedia("example3.tbl");
@@ -54,7 +54,7 @@ public class Game extends StdGame {
 		}
 		
 		if(level==2){
-			String[] e = {"zombie","shooter","blood"};
+			String[] e = {"zombie","shooter","angry"};
 			doLevel(e);
 		}
 		if(level==3){
@@ -151,20 +151,21 @@ public class Game extends StdGame {
 		}
 		private void fireWeapon() {
 			if (getKey(key_fire) && weapon==1 && countObjects("bullet",0) < 1 ) {
-				new JGObject("bullet",true,x,y,3,"gun"+weapon_dir, xfacing*6,yfacing*6, -2);
+				new JGObject("bullet",true,x,y,3,"gun"+weapon_dir, xfacing*6,yfacing*6, -3);
 				System.out.println("fire!");
 				clearKey(key_fire);
 			}
 			System.out.println(countObjects("bullet",0));
 			if (getKey(key_fire) && weapon==2 && countObjects("mbullet",0)<3){
-				new JGObject("mbullet",true,x,y,3,"gun"+weapon_dir, xfacing*6,yfacing*6, -2);
+				new JGObject("mbullet",true,x,y,3,"gun"+weapon_dir, xfacing*6,yfacing*6, -3);
 				clearKey(key_fire);
+				
 			}	
 			if(getKey(key_fire) && weapon==3 && countObjects("arrow",0)<1){
-				new JGObject("arrow",true,x,y,3,"arrow"+weapon_dir, xfacing*6,yfacing*6, -2);
+				new JGObject("arrow",true,x,y,3,"arrow"+weapon_dir, xfacing*6,yfacing*6, -3);
 			}
-			if (getKey(key_fire) && weapon==4){
-				new JGObject("laser",true,x,y,3,"laser"+weapon_dir, xfacing*6,yfacing*6, -2);
+			if (getKey(key_fire) && weapon==4 && countObjects("laser",0)<3){
+				new JGObject("laser",true,x,y,3,"laser"+weapon_dir, xfacing*6,yfacing*6, -3);
 			}
 
 			if(getKey(key_cycleweapon)){
@@ -193,17 +194,16 @@ public class Game extends StdGame {
 			if(ydir<0)setGraphic("mymex_d");
 			if(ydir>0)setGraphic("mymex_u");
 		}
-		//player hits zombie or projectile
-//		public void hit(JGObject obj) {
-//			if (obj.colid==2 && colid==1){ 
-//				lifeLost();
-//				remove();
-//			}
-//			if(obj.colid==4 && colid==1){
-//				lifeLost();
-//				remove();
-//			}
-//		}
+		public void hit(JGObject obj) {
+			if (obj.colid==2 && colid==1){ 
+				lifeLost();
+				remove();
+			}
+			if(obj.colid==4 && colid==1){
+				lifeLost();
+				remove();
+			}
+		}
 		public void changeWeapon(){
 			if(weapon==level+1)weapon=1;
 			
@@ -246,7 +246,7 @@ public class Game extends StdGame {
 		public ShootingZombie(){
 			super("shooter",.4,getSpawn()[0],getSpawn()[1]);
 			this.shooter=true;
-			this.setAnimation("myshooter_l", "myshooter_r", "myshooter4");
+			this.setAnimation("myexploder_l", "myexploder_r", "myexploder4");
 		}
 		
 	}
@@ -357,27 +357,32 @@ public class Game extends StdGame {
 
 	}
 	public void paintFrameStartLevel(){
-		drawString("Level " + stage+1,viewWidth()/2,viewHeight()/4,0);
+		drawString("Level " + (stage+1),viewWidth()/2,viewHeight()/4,0);
 		drawString("START",viewWidth()/2,viewHeight()/4+50,0);
 		if(level==1){
 			drawString("New Weapon: machine gun",viewWidth()/2,viewHeight()/2,0);
-			drawString("New Enemy: blood spitter",viewWidth()/2,viewHeight()/1.5,0);
+			drawString("New Enemy: Blood Spitter",viewWidth()/2,viewHeight()/1.5,0);
 		}
 		if(level==2){
-			drawString("New Weapon: arrow",viewWidth()/2,viewHeight()/2,0);
-			drawString("New Enemy: blood gusher",viewWidth()/2,viewHeight()/1.5,0);
+			drawString("New Weapon: laser",viewWidth()/2,viewHeight()/2,0);
+			drawString("New Enemy: Angry Zombie",viewWidth()/2,viewHeight()/1.5,0);
 		}
-		if(level==3)drawString("New Weapon: laser",viewWidth()/2,viewHeight()/2,0);
+		if(level==3){
+			drawString("New Weapon: arrow",viewWidth()/2,viewHeight()/2,0);
+			drawString("New Enemy: Blood Exploder",viewWidth()/2,viewHeight()/1.5,0);
+			
+		}
 
 
 	}
 	public void paintFrameTitle(){
-		setFont(new JGFont("arial",1,10));
-		drawString("Zombie Invasion: Will You Survive???", viewWidth()/2,viewHeight()/4,0);
+		//setColorsFont(JGColor.green, JGColor.black,new JGFont("arial",1,10) );
+		//setFont(new JGFont("arial",1,10));
+		setTextOutline(2, JGColor.red);
+		drawString("Will You Survive Cinco de Mayo?", viewWidth()/2,viewHeight()/4,0);
 		drawString("Press Space to Start",
 				viewWidth()/2,viewHeight()/2,0);
 		drawString("Press Enter for Instructions",viewWidth()/2,viewHeight()/1.5,0);
-		drawString("Next", viewWidth()/2,viewHeight()/4,0);
 	}
 }
 
