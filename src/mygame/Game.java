@@ -34,7 +34,6 @@ public class Game extends StdGame {
 		setPFSize(64,48);
 		try { Thread.sleep(2000); }
 		catch (InterruptedException e) {}
-
 		try { Thread.sleep(2000); }
 		catch (InterruptedException e) {}
 	}
@@ -48,12 +47,10 @@ public class Game extends StdGame {
 		int xofs=(int)dino.x;
 		int yofs=(int)dino.y;
 		setViewOffset(xofs,yofs,true);
-		System.out.println(countObjects("zombie",0));
 		//level1
 		if(checkTime(0,(int)(800),(int)((40+level*4))))
 			new Zombie();
 		if(countObjects("zombie",0)==0 && gametime>80){
-
 			levelDone();
 		}
 
@@ -63,7 +60,12 @@ public class Game extends StdGame {
 				levelDone();
 			if(checkTime(0,(int)(800),(int)((100-level/2))))
 				new BloodExploder();
+			if(level>2){
+				if(checkTime(0,(int)(800),(int)((100-level/2))))
+					new AngryZombie();
+			}
 		}
+
 
 	}
 
@@ -73,17 +75,21 @@ public class Game extends StdGame {
 		gametime=0;
 	}
 	public double[] getSpawn(){
+		double x = random(0,pfWidth());
+		double y = random(0,pfHeight());
+		
+		while(x<(dino.x+viewWidth()/2) && x>(dino.x-viewWidth()/2)){
+			System.out.println("x"+x);
+			x = random(0,pfWidth());
+			
+		}
+		while(y<(dino.y+viewHeight()/2) && y>(dino.y-viewHeight()/2)){
+			y = random(0,pfHeight());
+			System.out.println("y"+x);
+		}
 		double[] range = new double[2];
-		double x1=dino.x-pfWidth()/2;
-		double x2=dino.x+pfWidth()/2;
-		double y1=dino.y-pfHeight()/2;
-		double y2=dino.y-pfHeight()/2;
-		if(random(0,1)>.5)range[0]=x1;
-		else{range[0]=x2;}
-		if(random(0,1)>.5)range[1]=y1;
-		else{range[1]=y2;}
+		range[0]=x;range[1]=y;
 		return range;
-
 	}
 	public void defineLevel(){
 		removeObjects(null,0);
@@ -177,8 +183,8 @@ public class Game extends StdGame {
 		}
 		public void move(){
 			if(hitWalls()){ }
-			if (checkTime(0,(int)(80000000),(int)120))
-				for(int i=0;i<10;i++)
+			if (checkTime(0,(int)(80000000),(int)200))
+				for(int i=0;i<8;i++)
 					new JGObject("bullet",true,x,y,4,"blood", random(-3,3),random(-3,3), -2);
 		}
 	}
@@ -189,18 +195,18 @@ public class Game extends StdGame {
 		public Zombie(){
 			super("zombie",.4,getSpawn()[0],getSpawn()[1]);
 			this.setAnimation("myalien_l", "myalien_r", "myalienr4");
-			
+
 		}
 	}
 	public class AngryZombie extends Enemy{
-		
+
 		public AngryZombie(){
 			super("angryzombie",.4,getSpawn()[0],getSpawn()[1]);
 			this.angry=true;
 			this.hitpoints=-4;
 		}
-			
-		
+
+
 	}
 	abstract class Enemy extends JGObject{
 		private double SPEED = .4;
@@ -229,9 +235,9 @@ public class Game extends StdGame {
 			if(o.colid==3 && hitpoints<3){
 				hitpoints++;
 				if(angry){angry();}
-					
+
 				if(dino.weapon!=3)o.remove();
-				
+
 			}
 			if(o.colid==3 && hitpoints==3){
 				if(dino.weapon!=3)o.remove();
@@ -242,7 +248,7 @@ public class Game extends StdGame {
 		public void angry(){
 			this.SPEED=.8;
 			setAnimation("myangry_l", "myangry_r", "myangry_l4");
-			
+
 		}
 		public void setAnimation(String left, String right, String still){
 			if (xspeed < 0) setGraphic(left); 
@@ -250,7 +256,7 @@ public class Game extends StdGame {
 			if(xspeed==0)setGraphic(still);
 		}
 		public void move(){
-		
+
 			if(hitWalls()){ }
 
 			else if(hitZombiex() || hitZombiey()){}
