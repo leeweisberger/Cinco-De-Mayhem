@@ -20,7 +20,6 @@ public class Game extends StdGame {
 	public void initCanvas() { setCanvasSettings(48,32,8,8,null,null,null); } 
 
 	public void initGame() {
-
 		defineMedia("example3.tbl");
 		setBGImage("lot");
 		if (isMidlet()) {
@@ -34,8 +33,6 @@ public class Game extends StdGame {
 		setPFSize(64,48);
 		try { Thread.sleep(2000); }
 		catch (InterruptedException e) {}
-		try { Thread.sleep(2000); }
-		catch (InterruptedException e) {}
 	}
 	public void doFrameInGame() {
 		// Move all objects.
@@ -47,26 +44,50 @@ public class Game extends StdGame {
 		int xofs=(int)dino.x;
 		int yofs=(int)dino.y;
 		setViewOffset(xofs,yofs,true);
-		//level1
-		if(checkTime(0,(int)(800),(int)((40+level*4))))
+		if(level==0){
+			String[] e = {"zombie"};
+			doLevel(e);
+		}
+		if(level==1){
+			String[] e = {"zombie","shooter"};
+			doLevel(e);
+		}
+		
+		if(level==2){
+			String[] e = {"zombie","shooter","blood"};
+			doLevel(e);
+		}
+		if(level==3){
+			String[] e = {"zombie","shooter","blood","angry"};
+			doLevel(e);
+		}
+			
+	}
+	public void doLevel(String[] enemies){
+		for(String enemy:enemies){
+			if(checkTime(0,(int)(800),(int)((30+level*10))))
+				chooseEnemy(enemy);
+		}
+		checkIfLevelDone(enemies);
+		
+	}
+	private void checkIfLevelDone(String[] enemies) {
+		boolean enemiesLeft=false;
+		for(String enemy:enemies){
+			if(countObjects(enemy,0)!=0)enemiesLeft=true;
+			if(enemiesLeft)break;
+		}
+		if(!enemiesLeft && gametime>200)levelDone();
+	}
+	public void chooseEnemy(String enemy){
+		if(enemy.equals("zombie"))
 			new Zombie();
-		if(countObjects("zombie",0)==0 && gametime>80){
-			levelDone();
-		}
-
-		//level3+
-		if(level>1){
-			if(countObjects("boss",0)==0 && gametime>80)
-				levelDone();
-			if(checkTime(0,(int)(800),(int)((100-level/2))))
-				new BloodExploder();
-			if(level>2){
-				if(checkTime(0,(int)(800),(int)((100-level/2))))
-					new AngryZombie();
-			}
-		}
-
-
+		else if(enemy.equals("angry"))
+			new AngryZombie();
+		else if(enemy.equals("blood"))
+			new BloodExploder();
+		else if(enemy.equals("shooter"))
+			new ShootingZombie();
 	}
 
 	public void initNewLife() {
@@ -79,13 +100,11 @@ public class Game extends StdGame {
 		double y = random(0,pfHeight());
 		
 		while(x<(dino.x+viewWidth()/2) && x>(dino.x-viewWidth()/2)){
-			System.out.println("x"+x);
 			x = random(0,pfWidth());
 			
 		}
 		while(y<(dino.y+viewHeight()/2) && y>(dino.y-viewHeight()/2)){
 			y = random(0,pfHeight());
-			System.out.println("y"+x);
 		}
 		double[] range = new double[2];
 		range[0]=x;range[1]=y;
@@ -94,7 +113,6 @@ public class Game extends StdGame {
 	public void defineLevel(){
 		removeObjects(null,0);
 		initNewLife();
-		dino.weapon=1;
 	}
 	public void incrementLevel() {
 		score += 50;
@@ -114,27 +132,16 @@ public class Game extends StdGame {
 			super("player",true,x,y,1,"mymex_l4", 0,0,speed,speed,-1);
 		}
 		public void move() {
-			if (xdir < 0) setGraphic("mymex_l"); 
-			if (xdir>0) setGraphic("mymex_r");
-			if(xdir==0 && ydir==0)setGraphic("mymex_l4");
-			if(ydir<0)setGraphic("mymex_d");
-			if(ydir>0)setGraphic("mymex_u");
+			playerGraphic();
 
 			setDir(0,0);
 
-			if (getKey(key_left)  && x > xspeed){
-				xdir=-1; xfacing=-1; yfacing=0;
-			}
-			if (getKey(key_right) && x < pfWidth()-5-yspeed){
-				xdir=1;xfacing=1;yfacing=0;
-			}
-			if (getKey(key_down) && y<pfHeight()-10){
-				ydir=1;yfacing=1;xfacing=0;
-			}
-			if (getKey(key_up) && y>0) 	{
-				ydir=-1;yfacing=-1;xfacing=0;
-			}
+			playerMove();
 			//which direction weapon should be used
+			weaponDirection();
+			fireWeapon();
+		}
+		private void weaponDirection() {
 			if(xfacing==1)weapon_dir="r";
 			if(xfacing==-1)weapon_dir="l";
 			if(yfacing==1)weapon_dir="u";
@@ -143,6 +150,9 @@ public class Game extends StdGame {
 				new JGObject("bullet",true,x,y,3,"gun"+weapon_dir, xfacing*6,yfacing*6, -2);
 				clearKey(key_fire);
 			}
+			
+		}
+		private void fireWeapon() {
 			if (getKey(key_fire) && weapon==2 && countObjects("mbullet",0)<3){
 				new JGObject("mbullet",true,x,y,3,"gun"+weapon_dir, xfacing*6,yfacing*6, -2);
 				clearKey(key_fire);
@@ -159,19 +169,40 @@ public class Game extends StdGame {
 				clearKey(key_cycleweapon);
 			}
 		}
-		//player hits zombie or projectile
-		public void hit(JGObject obj) {
-			if (obj.colid==2 && colid==1){ 
-				lifeLost();
-				remove();
+		private void playerMove() {
+			if (getKey(key_left)  && x > xspeed){
+				xdir=-1; xfacing=-1; yfacing=0;
 			}
-			if(obj.colid==4 && colid==1){
-				lifeLost();
-				remove();
+			if (getKey(key_right) && x < pfWidth()-5-yspeed){
+				xdir=1;xfacing=1;yfacing=0;
+			}
+			if (getKey(key_down) && y<pfHeight()-10){
+				ydir=1;yfacing=1;xfacing=0;
+			}
+			if (getKey(key_up) && y>0) 	{
+				ydir=-1;yfacing=-1;xfacing=0;
 			}
 		}
+		private void playerGraphic() {
+			if (xdir < 0) setGraphic("mymex_l"); 
+			if (xdir>0) setGraphic("mymex_r");
+			if(xdir==0 && ydir==0)setGraphic("mymex_l4");
+			if(ydir<0)setGraphic("mymex_d");
+			if(ydir>0)setGraphic("mymex_u");
+		}
+		//player hits zombie or projectile
+//		public void hit(JGObject obj) {
+//			if (obj.colid==2 && colid==1){ 
+//				lifeLost();
+//				remove();
+//			}
+//			if(obj.colid==4 && colid==1){
+//				lifeLost();
+//				remove();
+//			}
+//		}
 		public void changeWeapon(){
-			if(weapon==4+1)weapon=1;
+			if(weapon==level+1)weapon=1;
 			else
 				weapon++;
 		}
@@ -199,19 +230,26 @@ public class Game extends StdGame {
 		}
 	}
 	public class AngryZombie extends Enemy{
-
 		public AngryZombie(){
 			super("angryzombie",.4,getSpawn()[0],getSpawn()[1]);
+			this.setAnimation("myalien_l", "myalien_r", "myalienr4");
 			this.angry=true;
 			this.hitpoints=-4;
 		}
-
-
+	}
+	public class ShootingZombie extends Enemy{
+		public ShootingZombie(){
+			super("shooter",.4,getSpawn()[0],getSpawn()[1]);
+			this.shooter=true;
+			this.setAnimation("myshooter_l", "myshooter_r", "myshooter4");
+		}
+		
 	}
 	abstract class Enemy extends JGObject{
 		private double SPEED = .4;
 		public int hitpoints;
 		boolean angry;
+		boolean shooter;
 		public Enemy(String name,double speed,double xspawn,double yspawn){
 			super(name,true,xspawn,yspawn,2,"dino",0,0,1,1,-1);	
 			xspeed = speed;
@@ -237,7 +275,6 @@ public class Game extends StdGame {
 				if(angry){angry();}
 
 				if(dino.weapon!=3)o.remove();
-
 			}
 			if(o.colid==3 && hitpoints==3){
 				if(dino.weapon!=3)o.remove();
@@ -262,24 +299,27 @@ public class Game extends StdGame {
 			else if(hitZombiex() || hitZombiey()){}
 
 			else{
-				xspeed=SPEED;yspeed=SPEED;
-				if(dino.x>x ){
-					xspeed = Math.abs(xspeed);
-				}
-				if(dino.x<x  ){
-					xspeed = -Math.abs(xspeed);
-				}
-				if(dino.y>y  ){
-					yspeed = Math.abs(yspeed); 
-				}
-				if(dino.y<y  ){
-					yspeed = -Math.abs(yspeed); 
-				}
+				followPlayer();
 
 			}
-			if (level>0 && checkTime(0,80000000,70))
+			if (shooter && checkTime(0,80000000,70))
 				new JGObject("bullet",true,x,y,4,"blood", random(-3,3),random(-3,3), -2);
 
+		}
+		private void followPlayer() {
+			xspeed=SPEED;yspeed=SPEED;
+			if(dino.x>x ){
+				xspeed = Math.abs(xspeed);
+			}
+			if(dino.x<x  ){
+				xspeed = -Math.abs(xspeed);
+			}
+			if(dino.y>y  ){
+				yspeed = Math.abs(yspeed); 
+			}
+			if(dino.y<y  ){
+				yspeed = -Math.abs(yspeed); 
+			}
 		}
 		public boolean hitZombiex(){
 			if(checkCollision(2,4*SPEED,0)!=0){
