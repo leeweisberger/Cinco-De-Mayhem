@@ -65,7 +65,7 @@ public class Game extends StdGame {
 	}
 	public void doLevel(String[] enemies){
 		for(String enemy:enemies){
-			if(checkTime(0,(int)(800),(int)((30+level*10))))
+			if(checkTime(0,(int)(800),(int)((30+level*20))))
 				chooseEnemy(enemy);
 		}
 		checkIfLevelDone(enemies);
@@ -146,13 +146,16 @@ public class Game extends StdGame {
 			if(xfacing==-1)weapon_dir="l";
 			if(yfacing==1)weapon_dir="u";
 			if(yfacing==-1)weapon_dir="d";
-			if (getKey(key_fire) && weapon==1 && countObjects("bullet",0) < 1 ) {
-				new JGObject("bullet",true,x,y,3,"gun"+weapon_dir, xfacing*6,yfacing*6, -2);
-				clearKey(key_fire);
-			}
+			
 			
 		}
 		private void fireWeapon() {
+			if (getKey(key_fire) && weapon==1 && countObjects("bullet",0) < 1 ) {
+				new JGObject("bullet",true,x,y,3,"gun"+weapon_dir, xfacing*6,yfacing*6, -2);
+				System.out.println("fire!");
+				clearKey(key_fire);
+			}
+			System.out.println(countObjects("bullet",0));
 			if (getKey(key_fire) && weapon==2 && countObjects("mbullet",0)<3){
 				new JGObject("mbullet",true,x,y,3,"gun"+weapon_dir, xfacing*6,yfacing*6, -2);
 				clearKey(key_fire);
@@ -203,8 +206,10 @@ public class Game extends StdGame {
 //		}
 		public void changeWeapon(){
 			if(weapon==level+1)weapon=1;
+			
 			else
 				weapon++;
+			System.out.println(weapon);
 		}
 	}
 	public class BloodExploder extends Enemy{
@@ -296,14 +301,14 @@ public class Game extends StdGame {
 
 			if(hitWalls()){ }
 
-			else if(hitZombiex() || hitZombiey()){}
+			else if(contactZombieX() || contactZombieY()){}
 
 			else{
 				followPlayer();
 
 			}
 			if (shooter && checkTime(0,80000000,70))
-				new JGObject("bullet",true,x,y,4,"blood", random(-3,3),random(-3,3), -2);
+				new JGObject("blood",true,x,y,4,"blood", random(-3,3),random(-3,3), -2);
 
 		}
 		private void followPlayer() {
@@ -321,7 +326,7 @@ public class Game extends StdGame {
 				yspeed = -Math.abs(yspeed); 
 			}
 		}
-		public boolean hitZombiex(){
+		public boolean contactZombieX(){
 			if(checkCollision(2,4*SPEED,0)!=0){
 				if(xspeed!=0){xspeed=0;return true;}
 				if(checkCollision(2,-4*SPEED,0)==0){xspeed=-SPEED; return true;}
@@ -335,7 +340,7 @@ public class Game extends StdGame {
 
 			return false;
 		}
-		public boolean hitZombiey(){
+		public boolean contactZombieY(){
 			if(checkCollision(2,0,4*SPEED)!=0){
 				if(yspeed!=0){yspeed=0;return true;}
 				if(checkCollision(2,0,-4*SPEED)==0){yspeed=-SPEED; return true;}
