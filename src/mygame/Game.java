@@ -144,37 +144,16 @@ public class Game extends StdGame {
 			if(xfacing==1)weapon_dir="r";
 			if(xfacing==-1)weapon_dir="l";
 			if(yfacing==1)weapon_dir="u";
-			if(yfacing==-1)weapon_dir="d";
-			
-			
+			if(yfacing==-1)weapon_dir="d";	
 		}
 		private void fireWeapon() {
-			//whichWeapon()
-			if (getKey(key_fire) && weapon==1 && countObjects("bullet",0) < 1 ) {
-				new JGObject("bullet",true,x,y,3,"gun"+weapon_dir, xfacing*6,yfacing*6, -3);
-				System.out.println("fire!");
-				clearKey(key_fire);
-			}
-			System.out.println(countObjects("bullet",0));
-			if (getKey(key_fire) && weapon==2 && countObjects("mbullet",0)<3){
-				new JGObject("mbullet",true,x,y,3,"gun"+weapon_dir, xfacing*6,yfacing*6, -3);
-				clearKey(key_fire);
-				
-			}	
-			if(getKey(key_fire) && weapon==3 && countObjects("arrow",0)<1){
-				new JGObject("arrow",true,x,y,3,"arrow"+weapon_dir, xfacing*6,yfacing*6, -3);
-			}
-			if (getKey(key_fire) && weapon==4 && countObjects("laser",0)<3){
-				new JGObject("laser",true,x,y,3,"laser"+weapon_dir, xfacing*6,yfacing*6, -3);
-			}
-
-			if(getKey(key_cycleweapon)){
-				changeWeapon();
-				clearKey(key_cycleweapon);
-			}
+			makeWeapon("bullet",1,1);
+			makeWeapon("mbullet",2,3);
+			makeWeapon("laser",3,3);
+			makeWeapon("arrow",4,1);
 		}
-		public void whichWeapon(String name, int key, int weaponNum, int howMany ){
-			if (getKey(key) && weapon==weaponNum && countObjects("name",0) < howMany )
+		public void makeWeapon(String name, int weaponNum, int howMany ){
+			if (getKey(key_fire) && weapon==weaponNum && countObjects("name",0) < howMany )
 				new JGObject(name,true,x,y,3,name+weapon_dir, xfacing*6,yfacing*6,-3);
 		}
 		private void playerMove() {
