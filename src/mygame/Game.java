@@ -112,8 +112,14 @@ public class Game extends StdGame {
 	}
 	public void incrementLevel() {
 		score += 50;
-		if (level<7) level++;
+		
+		level++;
+		
 		stage++;
+		if(stage>3){
+			drawString("YOU WIN", viewWidth()/2,viewHeight()/4,0);
+			startGameOver();
+		}
 	}
 	public void startGameOver() { removeObjects(null,0); }
 
@@ -154,7 +160,6 @@ public class Game extends StdGame {
 			if (weapon==weaponNum && countObjects(name,0) < howMany )
 				new JGObject(name,true,x,y,3,name+weapon_dir, xfacing*6,yfacing*6,-3);
 			if(weapon!=3)clearKey(key_fire);
-			System.out.println("fire");
 		}
 		private void playerMove() {
 			if (getKey(key_left)  && x > xspeed){
@@ -193,7 +198,6 @@ public class Game extends StdGame {
 			
 			else
 				weapon++;
-			System.out.println(weapon);
 		}
 	}
 	public class BloodExploder extends Enemy{
@@ -362,7 +366,7 @@ public class Game extends StdGame {
 		drawString("Will You Survive Cinco de Mayo?", viewWidth()/2,viewHeight()/4,0);
 		drawString("Press Space to Start",
 				viewWidth()/2,viewHeight()/2,0);
-		drawString("Press Z to Shoot and X to Change Weapons",viewWidth()/2,viewHeight()/1.5,0);
+		drawString("Press Z to Shoot, X to Change Weapons, and / to Cheat",viewWidth()/2,viewHeight()/1.5,0);
 	}
 }
 

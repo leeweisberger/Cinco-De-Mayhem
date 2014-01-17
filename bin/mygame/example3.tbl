@@ -1,0 +1,149 @@
+// Fields are separated by one or more tabs.
+// Lines without tabs (such as these) are ignored, and can be used as comments.
+// Some fields (names, filenames) may contain spaces.
+
+// Define the splash image.  It will appear on the intro screen as soon as it
+// is loaded.  Therefore we should define it at the beginning of the
+// initialisation.
+// Note the "-", 0, and "-" field.  For an image:
+// * the second field is the tile name by which it is known (we
+//   use "-" here to indicate "don't care".  
+// * the third field is the tile cid of the tile (we just fill in 0)
+// * the fifth field is the graphical operation to perform on the loaded image
+//   file ("-" means none).  Available operations are flip ("x", "y") and
+//   rotate ("r" - right, "l" - left, "u" - 180 degrees).
+splash_image	-	0	splash.gif	-
+
+// define image to display as background
+mybackground	-	0	twirly-192.gif	-
+floor	-	0	floor.gif	-
+grass	-	0	grass.gif	-	
+lot	-	0	lot.gif	-
+//Define character sprite sheet
+mychar_sheet		Untitled.gif		0	0	8	10	0	0
+
+
+
+//Get chars from char sheet
+dino	-	0	mychar_sheet	0	-	
+dude	-	0	dude.gif	-
+//bullet
+arrowr	-	0	bullet.gif	-
+arrowl	-	0	bullet.gif	x
+arrowu	-	0	bullet.gif	r
+arrowd	-	0	bullet.gif	l
+gunr	-	0	gun.gif	-
+gunl	-	0	gun.gif	x
+gunu	-	0	gun.gif	r
+gund	-	0	gun.gif	l
+laserr	-	0	laser.gif	-
+laserl	-	0	laser.gif	x
+laseru	-	0	laser.gif	r
+laserd	-	0	laser.gif	l
+blood	-	0	blood.gif	-		
+// Define animation sprite sheet.
+// The first numbers (0,0) are the topleft coordinates of the sprites.
+// The next numbers (16,16) is the size of one sprite.
+// The last numbers (0,0) is the number of pixels to skip between sprites.
+myanim_sheet		munchie-r.gif		0	0	16	16	0	0
+mymex_sheet	mexican.gif	0	0	20	14	0	0	
+myalien_sheet	greenalien.gif	0	0	20	14	0	0
+myexploder_sheet	pinkalien.gif	0	0	20	14	0	0
+myangry_sheet	angry.gif	0	0	20	14	0	0
+myshooter_sheet	shooter.gif	0	0	20	14	0	0
+// Get dem images
+mymex_r1		-	0	mymex_sheet	0	-
+mymex_r2		-	0	mymex_sheet	1	-
+mymex_r3		-	0	mymex_sheet	2	-
+mymex_r4	-	0	mymex_sheet	3	-
+
+mymex_l1		-	0	mymex_sheet	0	u
+mymex_l2		-	0	mymex_sheet	1	u
+mymex_l3		-	0	mymex_sheet	2	u
+mymex_l4	-	0	mymex_sheet	3	u
+
+mymex_u1		-	0	mymex_sheet	0	l
+mymex_u2		-	0	mymex_sheet	1	l
+mymex_u3		-	0	mymex_sheet	2	l
+mymex_u4	-	0	mymex_sheet	3	l
+
+mymex_d1		-	0	mymex_sheet	0	r
+mymex_d2		-	0	mymex_sheet	1	r
+mymex_d3		-	0	mymex_sheet	2	r
+mymex_d4	-	0	mymex_sheet	3	r
+
+myalien_r1		-	0	myalien_sheet	0	-
+myalien_r2		-	0	myalien_sheet	1	-
+myalien_r3		-	0	myalien_sheet	2	-
+myalien_r4	-	0	myalien_sheet	3	-
+
+myalien_l1		-	0	myalien_sheet	0	u
+myalien_l2		-	0	myalien_sheet	1	u
+myalien_l3		-	0	myalien_sheet	2	u
+myalien_l4	-	0	myalien_sheet	3	u
+
+myexploder_r1		-	0	myexploder_sheet	0	-
+myexploder_r2		-	0	myexploder_sheet	1	-
+myexploder_r3		-	0	myexploder_sheet	2	-
+myexploder_r4	-	0	myexploder_sheet	3	-
+
+myexploder_l1		-	0	myexploder_sheet	0	u
+myexploder_l2		-	0	myexploder_sheet	1	u
+myexploder_l3		-	0	myexploder_sheet	2	u
+myexploder_l4	-	0	myexploder_sheet	3	u
+
+myangry_r1		-	0	myangry_sheet	0	-
+myangry_r2		-	0	myangry_sheet	1	-
+myangry_r3		-	0	myangry_sheet	2	-
+myangry_r4	-	0	myangry_sheet	3	-
+
+myangry_l1		-	0	myangry_sheet	0	u
+myangry_l2		-	0	myangry_sheet	1	u
+myangry_l3		-	0	myangry_sheet	2	u
+myangry_l4	-	0	myangry_sheet	3	u
+
+myshooter_r1		-	0	myshooter_sheet	0	-
+myshooter_r2		-	0	myshooter_sheet	1	-
+myshooter_r3		-	0	myshooter_sheet	2	-
+myshooter_r4	-	0	myshooter_sheet	3	-
+
+myshooter_l1		-	0	myshooter_sheet	0	u
+myshooter_l2		-	0	myshooter_sheet	1	u
+myshooter_l3		-	0	myshooter_sheet	2	u
+myshooter_l4	-	0	myshooter_sheet	3	u
+
+// Get the sprites from the sprite sheet
+myanim_l1		-	0	myanim_sheet	0	-
+myanim_l2		-	0	myanim_sheet	1	-
+myanim_l3		-	0	myanim_sheet	2	-
+
+// Define a pacman going right by mirroring ("x") the pacman animation
+myanim_r1		-	0	myanim_sheet	0	x
+myanim_r2		-	0	myanim_sheet	1	x
+myanim_r3		-	0	myanim_sheet	2	x
+
+// Define animations from the sprites.
+// 0.3 is the animation speed
+// the "true" indicates a ping-pong animation
+myanim_l	myanim_l1;myanim_l2;myanim_l3		0.3		true
+myanim_r	myanim_r1;myanim_r2;myanim_r3		0.3		true
+mymex_r	mymex_r1;mymex_r2;mymex_r3	0.1	true
+mymex_l	mymex_l1;mymex_l2;mymex_l3	0.1	true
+mymex_u	mymex_u1;mymex_u2;mymex_u3	0.1	true
+mymex_d	mymex_d1;mymex_d2;mymex_d3	0.1	true
+
+myalien_r	myalien_r1;myalien_r2;myalien_r3	0.1	true
+myalien_l	myalien_l1;myalien_l2;myalien_l3	0.1	true
+
+myexploder_r	myexploder_r1;myexploder_r2;myexploder_r3	0.1	true
+myexploder_l	myexploder_l1;myexploder_l2;myexploder_l3	0.1	true
+
+myangry_r	myangry_r1;myangry_r2;myangry_r3	0.1	true
+myangry_l	myangry_l1;myangry_l2;myangry_l3	0.1	true
+
+myshooter_r	myshooter_r1;myshooter_r2;myshooter_r3	0.1	true
+myshooter_l	myshooter_l1;myshooter_l2;myshooter_l3	0.1	true
+
+
+		-
+
