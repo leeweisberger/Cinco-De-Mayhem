@@ -118,7 +118,6 @@ public class Game extends StdGame {
 		score += 50;
 		if (level<7) level++;
 		stage++;
-		dino.weapon=1;
 	}
 	public void startGameOver() { removeObjects(null,0); }
 
@@ -150,6 +149,7 @@ public class Game extends StdGame {
 			
 		}
 		private void fireWeapon() {
+			//whichWeapon()
 			if (getKey(key_fire) && weapon==1 && countObjects("bullet",0) < 1 ) {
 				new JGObject("bullet",true,x,y,3,"gun"+weapon_dir, xfacing*6,yfacing*6, -3);
 				System.out.println("fire!");
@@ -172,6 +172,10 @@ public class Game extends StdGame {
 				changeWeapon();
 				clearKey(key_cycleweapon);
 			}
+		}
+		public void whichWeapon(String name, int key, int weaponNum, int howMany ){
+			if (getKey(key) && weapon==weaponNum && countObjects("name",0) < howMany )
+				new JGObject(name,true,x,y,3,name+weapon_dir, xfacing*6,yfacing*6,-3);
 		}
 		private void playerMove() {
 			if (getKey(key_left)  && x > xspeed){
@@ -351,11 +355,11 @@ public class Game extends StdGame {
 				if(checkCollision(2,0,4*SPEED)==0){yspeed=SPEED; return true;}
 				return true;
 			}
-
 			return false;
 		}
 
 	}
+	
 	public void paintFrameStartLevel(){
 		drawString("Level " + (stage+1),viewWidth()/2,viewHeight()/4,0);
 		drawString("START",viewWidth()/2,viewHeight()/4+50,0);
@@ -372,8 +376,6 @@ public class Game extends StdGame {
 			drawString("New Enemy: Blood Exploder",viewWidth()/2,viewHeight()/1.5,0);
 			
 		}
-
-
 	}
 	public void paintFrameTitle(){
 		//setColorsFont(JGColor.green, JGColor.black,new JGFont("arial",1,10) );
