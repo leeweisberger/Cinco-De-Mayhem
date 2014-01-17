@@ -6,6 +6,7 @@ import jgame.JGPoint;
 import jgame.platform.StdGame;
 /** Minimal shooter illustrating Eclipse usage. */
 public class Game extends StdGame {
+	boolean cheat = false;
 	Player dino;
 	public static void main(String[]args) {new Game(new JGPoint(1280,960));}
 	public Game() { initEngineApplet(); }
@@ -27,6 +28,7 @@ public class Game extends StdGame {
 		setPFSize(64,48);
 		try { Thread.sleep(2000); }
 		catch (InterruptedException e) {}
+		
 	}
 	public void doFrameInGame() {
 		// Move all objects.
@@ -119,22 +121,24 @@ public class Game extends StdGame {
 		int weapon = 1;
 		int xfacing=0;
 		int yfacing=1;
+		
 		String weapon_dir="r";
-
+		
 		public Player(double x,double y,double speed) {
 			super("player",true,x,y,1,"mymex_l4", 0,0,speed,speed,-1);
 		}
 		public void move() {
 			playerGraphic();
-
 			setDir(0,0);
-
 			playerMove();
-			//which direction weapon should be used
 			weaponDirection();
-			fireWeapon();
+			if(getKey(key_fire))fireWeapon();
+			if(getKey(key_cycleweapon)){
+				changeWeapon();clearKey(key_cycleweapon);
+			}
 		}
 		private void weaponDirection() {
+			
 			if(xfacing==1)weapon_dir="r";
 			if(xfacing==-1)weapon_dir="l";
 			if(yfacing==1)weapon_dir="u";
@@ -145,11 +149,12 @@ public class Game extends StdGame {
 			makeWeapon("gun",2,3);
 			makeWeapon("laser",3,3);
 			makeWeapon("arrow",4,1);
-			System.out.println(countObjects("gun",0));
 		}
 		public void makeWeapon(String name, int weaponNum, int howMany ){
-			if (getKey(key_fire) && weapon==weaponNum && countObjects(name,0) < howMany )
+			if (weapon==weaponNum && countObjects(name,0) < howMany )
 				new JGObject(name,true,x,y,3,name+weapon_dir, xfacing*6,yfacing*6,-3);
+			if(weapon!=3)clearKey(key_fire);
+			System.out.println("fire");
 		}
 		private void playerMove() {
 			if (getKey(key_left)  && x > xspeed){
@@ -164,6 +169,7 @@ public class Game extends StdGame {
 			if (getKey(key_up) && y>0) 	{
 				ydir=-1;yfacing=-1;xfacing=0;
 			}
+			if (getKey(key_action))cheat=true;
 		}
 		private void playerGraphic() {
 			if (xdir < 0) setGraphic("mymex_l"); 
@@ -173,17 +179,17 @@ public class Game extends StdGame {
 			if(ydir>0)setGraphic("mymex_u");
 		}
 		public void hit(JGObject obj) {
-			if (obj.colid==2 && colid==1){ 
+			if(obj.colid==2 && colid==1 && !cheat){ 
 				lifeLost();
 				remove();
 			}
-			if(obj.colid==4 && colid==1){
+			else if(obj.colid==4 && colid==1 && !cheat){
 				lifeLost();
 				remove();
 			}
 		}
 		public void changeWeapon(){
-			if(weapon==level+1)weapon=1;
+			if(weapon==4+1)weapon=1;
 			
 			else
 				weapon++;
@@ -202,8 +208,6 @@ public class Game extends StdGame {
 					new JGObject("bullet",true,x,y,4,"blood", random(-3,3),random(-3,3), -2);
 		}
 	}
-
-
 
 	public class Zombie extends Enemy{
 		public Zombie(){
@@ -255,12 +259,11 @@ public class Game extends StdGame {
 		public void hit(JGObject o) {
 			if(o.colid==3 && hitpoints<3){
 				hitpoints++;
-				if(angry){angry();}
-
-				if(dino.weapon!=3)o.remove();
+				if(angry)angry();
+				if(dino.weapon!=4)o.remove();
 			}
 			if(o.colid==3 && hitpoints==3){
-				if(dino.weapon!=3)o.remove();
+				if(dino.weapon!=4)o.remove();
 				remove();
 				score += 5;
 			}
@@ -355,10 +358,11 @@ public class Game extends StdGame {
 		//setColorsFont(JGColor.green, JGColor.black,new JGFont("arial",1,10) );
 		//setFont(new JGFont("arial",1,10));
 		setTextOutline(2, JGColor.red);
+		
 		drawString("Will You Survive Cinco de Mayo?", viewWidth()/2,viewHeight()/4,0);
 		drawString("Press Space to Start",
 				viewWidth()/2,viewHeight()/2,0);
-		drawString("Press Enter for Instructions",viewWidth()/2,viewHeight()/1.5,0);
+		drawString("Press Z to Shoot and X to Change Weapons",viewWidth()/2,viewHeight()/1.5,0);
 	}
 }
 
