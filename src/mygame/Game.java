@@ -1,6 +1,7 @@
 package mygame;
 import jgame.Highscore;
 import jgame.JGColor;
+import jgame.JGFont;
 import jgame.JGObject;
 import jgame.JGPoint;
 import jgame.platform.StdGame;
@@ -24,11 +25,11 @@ public class Game extends StdGame {
 			setFrameRate(45,1);
 		}
 		setHighscores(10,new Highscore(0,"nobody"),15);
-		startgame_ingame=true;
+
 		setPFSize(64,48);
 		try { Thread.sleep(2000); }
 		catch (InterruptedException e) {}
-		
+
 	}
 	public void doFrameInGame() {
 		// Move all objects.
@@ -48,24 +49,31 @@ public class Game extends StdGame {
 			String[] e = {"zombie","shooter"};
 			doLevel(e);
 		}
-		
+
 		if(level==2){
 			String[] e = {"zombie","shooter","angry"};
 			doLevel(e);
 		}
-		if(level==3){
+		if(level>2){
 			String[] e = {"zombie","shooter","blood","angry"};
 			doLevel(e);
 		}
-			
+
 	}
 	public void doLevel(String[] enemies){
 		for(String enemy:enemies){
-			if(checkTime(0,(int)(800),(int)((30+level*20))))
+			if(checkTime(0,(int)(800+level*15),(int)((30+level*10))))
 				chooseEnemy(enemy);
 		}
+		if(level>3){
+			for(String enemy:enemies){
+				if(checkTime(0,(int)(800+level*15),(int)((60-level*5))))
+					chooseEnemy(enemy);
+			}
+		}
+
 		checkIfLevelDone(enemies);
-		
+
 	}
 	private void checkIfLevelDone(String[] enemies) {
 		boolean enemiesLeft=false;
@@ -94,10 +102,10 @@ public class Game extends StdGame {
 	public double[] getSpawn(){
 		double x = random(0,pfWidth());
 		double y = random(0,pfHeight());
-		
+
 		while(x<(dino.x+viewWidth()/2) && x>(dino.x-viewWidth()/2)){
 			x = random(0,pfWidth());
-			
+
 		}
 		while(y<(dino.y+viewHeight()/2) && y>(dino.y-viewHeight()/2)){
 			y = random(0,pfHeight());
@@ -107,29 +115,28 @@ public class Game extends StdGame {
 		return range;
 	}
 	public void defineLevel(){
+
 		removeObjects(null,0);
 		initNewLife();
 	}
+
+	public void startGameOver() { removeObjects(null,0); }
 	public void incrementLevel() {
 		score += 50;
-		
 		level++;
-		
 		stage++;
-		if(stage>3){
-			drawString("YOU WIN", viewWidth()/2,viewHeight()/4,0);
-			startGameOver();
-		}
+
+
+
 	}
-	public void startGameOver() { removeObjects(null,0); }
 
 	public class Player extends JGObject {
 		int weapon = 1;
 		int xfacing=0;
 		int yfacing=1;
-		
+
 		String weapon_dir="r";
-		
+
 		public Player(double x,double y,double speed) {
 			super("player",true,x,y,1,"mymex_l4", 0,0,speed,speed,-1);
 		}
@@ -144,7 +151,7 @@ public class Game extends StdGame {
 			}
 		}
 		private void weaponDirection() {
-			
+
 			if(xfacing==1)weapon_dir="r";
 			if(xfacing==-1)weapon_dir="l";
 			if(yfacing==1)weapon_dir="u";
@@ -194,8 +201,8 @@ public class Game extends StdGame {
 			}
 		}
 		public void changeWeapon(){
-			if(weapon==4+1)weapon=1;
-			
+			if(weapon==level+1)weapon=1;
+
 			else
 				weapon++;
 		}
@@ -234,7 +241,7 @@ public class Game extends StdGame {
 			this.shooter=true;
 			this.setAnimation("myexploder_l", "myexploder_r", "myexploder4");
 		}
-		
+
 	}
 	abstract class Enemy extends JGObject{
 		private double SPEED = .4;
@@ -340,29 +347,29 @@ public class Game extends StdGame {
 		}
 
 	}
-	
+
 	public void paintFrameStartLevel(){
+
 		drawString("Level " + (stage+1),viewWidth()/2,viewHeight()/4,0);
 		drawString("START",viewWidth()/2,viewHeight()/4+50,0);
-		if(level==1){
-			drawString("New Weapon: machine gun",viewWidth()/2,viewHeight()/2,0);
-			drawString("New Enemy: Blood Spitter",viewWidth()/2,viewHeight()/1.5,0);
-		}
-		if(level==2){
-			drawString("New Weapon: laser",viewWidth()/2,viewHeight()/2,0);
-			drawString("New Enemy: Angry Zombie",viewWidth()/2,viewHeight()/1.5,0);
-		}
-		if(level==3){
-			drawString("New Weapon: arrow",viewWidth()/2,viewHeight()/2,0);
-			drawString("New Enemy: Blood Exploder",viewWidth()/2,viewHeight()/1.5,0);
-			
-		}
+
+		if(level==1)
+			levelPaint("machine gun", "Blood Spitter");
+		else if(level==2)
+			levelPaint("laser", "Angry Zombie");
+		else if(level==3)
+			levelPaint("arrow", "Blood Exploder");	
+	}
+	public void levelPaint(String weapon, String enemy){
+		drawString("New Weapon: "+weapon,viewWidth()/2,viewHeight()/2,0);
+		drawString("New Enemy: "+enemy,viewWidth()/2,viewHeight()/1.5,0);
+
 	}
 	public void paintFrameTitle(){
 		//setColorsFont(JGColor.green, JGColor.black,new JGFont("arial",1,10) );
 		//setFont(new JGFont("arial",1,10));
 		setTextOutline(2, JGColor.red);
-		
+
 		drawString("Will You Survive Cinco de Mayo?", viewWidth()/2,viewHeight()/4,0);
 		drawString("Press Space to Start",
 				viewWidth()/2,viewHeight()/2,0);

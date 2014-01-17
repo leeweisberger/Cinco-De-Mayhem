@@ -433,7 +433,7 @@ public abstract class StdGame extends JGEngine {
 		}
 	}
 	/** Go to title or to highscore entry screen. */
-	private void gotoTitle() {
+	public void gotoTitle() {
 		seqtimer=0;
 		clearKey(key_startgame);
 		if (highscores!=null
