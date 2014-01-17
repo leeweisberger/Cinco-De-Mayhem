@@ -104,10 +104,10 @@ public abstract class StdGame extends JGEngine {
 	public int key_fire      = 'Z';
 	/** Key for directional firing, default is WSAD keys for JRE, 2456 for
 	 * MIDP. */
-	public int key_fireleft = 'A', key_fireright= 'D',
-	           key_fireup   = 'W', key_firedown = 'S';
+
 	/** Key for special action, default is X for JRE, 8 for MIDP. */
-	public int key_action      = 'X';
+
+	public int key_cycleweapon = 'X';
 	/** Key for diagonal firing, default is none */
 	//public int key_fireupleft =0, key_firedownleft=0,
 	//           key_fireupright=0, key_firedownright=0;
@@ -723,8 +723,7 @@ public abstract class StdGame extends JGEngine {
 	}
 	/** Default displays "Start !". */
 	public void paintFrameStartGame() {
-		drawString("Start !",
-			viewWidth()/2,viewHeight()/3,0,title_font,title_color);
+		
 	}
 	/** Default displays "Level Done !". */
 	public void paintFrameLevelDone() {
