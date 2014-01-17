@@ -1,15 +1,9 @@
 package mygame;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Rectangle;
-
-
-
-import java.util.ArrayList;
-
-import mygame.MyGame.Enemy;
-import jgame.*;
-import jgame.platform.*;
+import jgame.Highscore;
+import jgame.JGColor;
+import jgame.JGObject;
+import jgame.JGPoint;
+import jgame.platform.StdGame;
 /** Minimal shooter illustrating Eclipse usage. */
 public class Game extends StdGame {
 	Player dino;
@@ -147,13 +141,14 @@ public class Game extends StdGame {
 			if(yfacing==-1)weapon_dir="d";	
 		}
 		private void fireWeapon() {
-			makeWeapon("bullet",1,1);
-			makeWeapon("mbullet",2,3);
+			makeWeapon("gun",1,1);
+			makeWeapon("gun",2,3);
 			makeWeapon("laser",3,3);
 			makeWeapon("arrow",4,1);
+			System.out.println(countObjects("gun",0));
 		}
 		public void makeWeapon(String name, int weaponNum, int howMany ){
-			if (getKey(key_fire) && weapon==weaponNum && countObjects("name",0) < howMany )
+			if (getKey(key_fire) && weapon==weaponNum && countObjects(name,0) < howMany )
 				new JGObject(name,true,x,y,3,name+weapon_dir, xfacing*6,yfacing*6,-3);
 		}
 		private void playerMove() {

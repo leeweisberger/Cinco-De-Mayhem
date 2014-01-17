@@ -96,6 +96,9 @@ public abstract class StdGame extends JGEngine {
 	/** Key for moving, default = cursors. */
 	public int key_left=KeyLeft, key_right=KeyRight,
 	           key_up  =KeyUp,    key_down=KeyDown;
+	public int key_fireleft = 'A', key_fireright= 'D',
+			              key_fireup   = 'W', key_firedown = 'S';
+	public int key_action      = 'X';
 	/** Key for moving diagonally, default = none. */
 	//public int key_upleft=0, key_downleft=0,
 	//           key_upright=0, key_downright=0;
