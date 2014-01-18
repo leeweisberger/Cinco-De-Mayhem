@@ -32,7 +32,7 @@ public class Game extends StdGame {
 
 	}
 	public void doFrameInGame() {
-		// Move all objects.
+		if(level>3)gameOver();
 		moveObjects();
 		checkCollision(2,2);
 		checkCollision(2,1);
@@ -41,37 +41,23 @@ public class Game extends StdGame {
 		int xofs=(int)dino.x;
 		int yofs=(int)dino.y;
 		setViewOffset(xofs,yofs,true);
-		if(level==0){
-			String[] e = {"zombie"};
-			doLevel(e);
-		}
-		if(level==1){
-			String[] e = {"zombie","shooter"};
-			doLevel(e);
-		}
-
-		if(level==2){
-			String[] e = {"zombie","shooter","angry"};
-			doLevel(e);
-		}
-		if(level>2){
-			String[] e = {"zombie","shooter","blood","angry"};
-			doLevel(e);
-		}
+		chooseEnemies();
 
 	}
+	private void chooseEnemies() {
+		String[] all_enemies = {"zombie","shooter","angry","blood"};
+		String[] level_enemies=new String[level+1];
+		for(int j=0;j<level+1;j++){
+			level_enemies[j]=all_enemies[j];
+		}
+		doLevel(level_enemies);
+	}
+
 	public void doLevel(String[] enemies){
 		for(String enemy:enemies){
 			if(checkTime(0,(int)(800+level*15),(int)((30+level*10))))
 				chooseEnemy(enemy);
 		}
-		if(level>3){
-			for(String enemy:enemies){
-				if(checkTime(0,(int)(800+level*15),(int)((60-level*5))))
-					chooseEnemy(enemy);
-			}
-		}
-
 		checkIfLevelDone(enemies);
 
 	}
@@ -120,23 +106,18 @@ public class Game extends StdGame {
 		initNewLife();
 	}
 
-	public void startGameOver() { removeObjects(null,0); }
 	public void incrementLevel() {
 		score += 50;
 		level++;
 		stage++;
-
-
-
 	}
 
 	public class Player extends JGObject {
 		int weapon = 1;
 		int xfacing=0;
 		int yfacing=1;
-
 		String weapon_dir="r";
-
+		
 		public Player(double x,double y,double speed) {
 			super("player",true,x,y,1,"mymex_l4", 0,0,speed,speed,-1);
 		}
@@ -349,7 +330,7 @@ public class Game extends StdGame {
 	}
 
 	public void paintFrameStartLevel(){
-
+		if(level==4)return;
 		drawString("Level " + (stage+1),viewWidth()/2,viewHeight()/4,0);
 		drawString("START",viewWidth()/2,viewHeight()/4+50,0);
 
@@ -366,6 +347,7 @@ public class Game extends StdGame {
 
 	}
 	public void paintFrameTitle(){
+
 		//setColorsFont(JGColor.green, JGColor.black,new JGFont("arial",1,10) );
 		//setFont(new JGFont("arial",1,10));
 		setTextOutline(2, JGColor.red);
